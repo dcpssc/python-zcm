@@ -1,12 +1,18 @@
 from zcm import *
+from random import randint
 
 class Network_Component(Component):
     """docstring for Network_Component"""
     def __init__(self):
         Component.__init__(self)
+        self.register_timer_operation("sim_step", self.sim_step)
+        self.q = randint(0,5)
+        print "q is:" , self.q
 
-    def request_update(self):
-        """Request the services of a remote server using the client_port"""
-        print "Client Timer : Sending message: client_timer_message"
-        response = self.client("client_section0").call("client_timer_message")
-        print "Client Timer : Received response :", response
+    def updateQueueLength(self, q):
+        self.publisher("pub_light1").send(str(q))
+        print "network sent queue"
+
+    def sim_step(self):
+        self.q = self.q + randint(0, 2)
+        self.updateQueueLength(self.q)
