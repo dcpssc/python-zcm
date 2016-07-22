@@ -17,9 +17,10 @@ if pwd not in sys.path:
 
 def main():
     """Entry point for the application script"""
+    print("hilllo")
 
     parser = argparse.ArgumentParser(description=\
-                                     'functionality: Spawn a ZCM Actor', 
+                                     'functionality: Spawn a ZCM Actor',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--config', nargs='?', default=None, help='Name of configuration file')
     args = vars(parser.parse_args())

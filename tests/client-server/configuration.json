@@ -18,12 +18,12 @@
 		    "Name" : "client_port",
 		    "Endpoints" : ["tcp://127.0.0.1:5510"]
 		}
-	    ] 
-	    
+	    ]
+
 	},
 
 	{
-	    "Name" : "server_component",	  
+	    "Name" : "server_component",
 	    "Definition" : "server.ServerComponent",
 
 	    "Servers" : [
@@ -33,7 +33,7 @@
 		    "Function" : "server_function",
  		    "Endpoints" : ["tcp://*:5510"]
 		}
-	    ] 
+	    ]
 	}
     ]
 }

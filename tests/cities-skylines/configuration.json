@@ -1,23 +1,98 @@
 {
     "Component Instances": [
 	{
+	    "Name" : "light0",
+	    "Definition" : "traffic_light_controller.Traffic_light_controller",
+
+	    "Timers" : [
+    		{
+    		    "Name" : "timer_pub_q1",
+    		    "Priority" : 50,
+    		    "Period" : 0.5,
+    		    "Function" : "updateQ1"
+    		}],
+
+      "Publishers" : [
+        {
+          "Name" : "pub_q",
+          "Endpoints" : ["tcp://*:5555"]
+        }
+      ],
+
+      "Subscribers" : [
+        {
+          "Name": "sub_qs",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "getQs",
+          "Endpoints": ["tcp://127.0.0.1:5555"]
+        }
+      ],
+
+      "Servers" : [
+        {
+          "Name" : "serve_section0",
+          "Priority" : 60,
+          "Function" : "next_state",
+          "Endpoints" : ["tcp://*:6000"]
+        }
+      ]
+
+	},
+  {
 	    "Name" : "light1",
 	    "Definition" : "traffic_light_controller.Traffic_light_controller",
 
 	    "Timers" : [
     		{
-    		    "Name" : "timer_pub_1",
+    		    "Name" : "timer_pub_q2",
     		    "Priority" : 50,
-    		    "Period" : 0.5,
-    		    "Function" : "timer_1_function",
-    		    "Endpoints" : ["tcp://*:5555"]
+    		    "Period" : 0.6,
+    		    "Function" : "updateQ2"
     		}],
 
-	    "Publishers" : [
-    		{
-    		    "Name" : "q1",
-    		    "Endpoints" : ["tcp://*:5555"]
-    		}]
-	}
+      "Publishers" : [
+        {
+          "Name" : "pub_q",
+          "Endpoints" : ["tcp://*:5557"]
+        }
+      ],
+      "Subscribers" : [
+        {
+          "Name": "sub_qs",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "getQs",
+          "Endpoints": ["tcp://127.0.0.1:5555"]
+        }
+      ],
+      "Servers" : [
+        {
+          "Name" : "serve_section1",
+          "Priority" : 60,
+          "Function" : "next_state",
+          "Endpoints" : ["tcp://*:6001"]
+        }
+      ]
+	},
+  {
+    "Name" : "Network_Component",
+    "Definition" : "network.Network_Component",
+
+    "Timers" : [
+      {
+        "Name" : "update",
+        "Priority" : 50,
+        "Period" : 1.0,
+        "Function" : "request_update"
+      }
+    ],
+    "Clients" : [
+      {
+        "Name" : "client_section0",
+        "Endpoints" : ["tcp://127.0.0.1:6000"]
+      }
+    ]
+  }
   ]
 }
