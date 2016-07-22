@@ -8,9 +8,16 @@
         {
           "Name": "my_Q0",
           "Priority" : 60,
-          "Filter" : "",
+          "Filter" : "light_0",
           "Function" : "controller",
           "Endpoints": ["tcp://127.0.0.1:5000"]
+        }
+      ],
+      "Publishers" :
+      [
+        {
+          "Name" : "controller_port",
+          "Endpoints" : ["tcp://*:6000"]
         }
       ]
     },
@@ -21,9 +28,16 @@
         {
           "Name": "my_Q1",
           "Priority" : 60,
-          "Filter" : "",
+          "Filter" : "light_1",
           "Function" : "controller",
           "Endpoints": ["tcp://127.0.0.1:5000"]
+        }
+      ],
+      "Publishers" :
+      [
+        {
+          "Name" : "controller_port",
+          "Endpoints" : ["tcp://*:6000"]
         }
       ]
     },
@@ -42,8 +56,17 @@
       "Publishers" :
       [
         {
-          "Name" : "pub_light1",
+          "Name" : "pub_light",
           "Endpoints" : ["tcp://*:5000"]
+        }
+      ],
+      "Subscribers" : [
+        {
+          "Name": "switchState",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "switchState",
+          "Endpoints": ["tcp://127.0.0.1:6000"]
         }
       ]
     }

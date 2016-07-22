@@ -1,4 +1,5 @@
 from zcm import *
+from random import randint
 
 class Traffic_light_controller(Component):
     """Register traffic light controller"""
@@ -8,3 +9,4 @@ class Traffic_light_controller(Component):
 
     def controller(self, msg):
         print msg
+        self.publisher("controller_port").send("control says" + msg)
