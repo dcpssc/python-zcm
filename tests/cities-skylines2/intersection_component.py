@@ -2,6 +2,7 @@ from zcm import *
 from random import randint
 import numpy as np
 import config
+import sys
 
 class Intersection_Component(Component):
     """docstring for Network_Component"""
@@ -36,11 +37,12 @@ class Intersection_Component(Component):
             self.clock += 1
         self.simStep(self.statesList[self.currentIdx])
 
-        self.publisher("pushQN").send(str(self.Qs[0]))
-        self.publisher("pushQE").send(str(self.Qs[1]))
-        self.publisher("pushQS").send(str(self.Qs[2]))
-        self.publisher("pushQW").send(str(self.Qs[3]))
-        print "pushed"
+        self.publisher("pushQN").send(str(self.name) +": "+ str(self.Qs[0]))
+        #self.publisher("pushQE").send(self.name + str(self.Qs[1]))
+        #self.publisher("pushQS").send(self.name + str(self.Qs[2]))
+        #self.publisher("pushQW").send(self.name + str(self.Qs[3]))
+        #print "pushed"
+        #print self.name
 
     def controllor(self):
         currentState = self.statesList[self.currentIdx]

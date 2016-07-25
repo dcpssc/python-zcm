@@ -18,6 +18,13 @@
           "Filter" : "",
           "Function" : "coordinate",
           "Endpoints": ["tcp://127.0.0.1:5013"]
+        },
+        {
+          "Name": "QS",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5020"]
         }
       ],
       "Publishers" :[
@@ -58,6 +65,13 @@
           "Filter" : "",
           "Function" : "coordinate",
           "Endpoints": ["tcp://127.0.0.1:5001"]
+        },
+        {
+          "Name": "QS",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5030"]
         }
       ],
       "Publishers" :[
@@ -76,6 +90,100 @@
         {
           "Name" : "pushQW",
           "Endpoints" : ["tcp://*:5013"]
+        }
+      ]
+    },
+
+    {
+      "Name" : "light2",
+      "Definition" : "intersection_component.Intersection_Component",
+      "Timers" : [
+        {
+          "Name" : "timer",
+          "Priority" : 50,
+          "Period" : 1.0,
+          "Function": "update"
+        }
+      ],
+      "Subscribers" : [
+        {
+          "Name": "QN",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5002"]
+        },
+        {
+          "Name": "QE",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5033"]
+        }
+      ],
+      "Publishers" :[
+        {
+          "Name" : "pushQN",
+          "Endpoints" : ["tcp://*:5020"]
+        },
+        {
+          "Name" : "pushQE",
+          "Endpoints" : ["tcp://*:5021"]
+        },
+        {
+          "Name" : "pushQS",
+          "Endpoints" : ["tcp://*:5022"]
+        },
+        {
+          "Name" : "pushQW",
+          "Endpoints" : ["tcp://*:5023"]
+        }
+      ]
+    },
+
+    {
+      "Name" : "light3",
+      "Definition" : "intersection_component.Intersection_Component",
+      "Timers" : [
+        {
+          "Name" : "timer",
+          "Priority" : 50,
+          "Period" : 1.0,
+          "Function": "update"
+        }
+      ],
+      "Subscribers" : [
+        {
+          "Name": "QW",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5021"]
+        },
+        {
+          "Name": "QN",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinate",
+          "Endpoints": ["tcp://127.0.0.1:5012"]
+        }
+      ],
+      "Publishers" :[
+        {
+          "Name" : "pushQN",
+          "Endpoints" : ["tcp://*:5030"]
+        },
+        {
+          "Name" : "pushQE",
+          "Endpoints" : ["tcp://*:5031"]
+        },
+        {
+          "Name" : "pushQS",
+          "Endpoints" : ["tcp://*:5032"]
+        },
+        {
+          "Name" : "pushQW",
+          "Endpoints" : ["tcp://*:5033"]
         }
       ]
     }
