@@ -6,6 +6,7 @@ import sys
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 import json
+from time import time
 
 class Intersection_Component(Component):
     """docstring for Network_Component"""
@@ -14,33 +15,42 @@ class Intersection_Component(Component):
         Component.__init__(self)
         #queue parameters?
         self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
-        #self.State = self.getState()
-        self.minInterval = [0, 0]
+        self.minInterval = [5, 5]
         self.maxInterval = [10, 20]
-        self.threshold1 = [10, 10] #if density % is lower don't switch
+        self.threshold1 = [30, 30] #if density % is lower don't switch
         self.threshold2 = [70, 70] #if density % if higher don't switch
-        self.statesList = ['2020', '0202']
+        self.statesList = ['1', '2']
+        #self.stateMask = ['0202']
         self.currentIdx = 0
         self.clock = 0
+        #pp.pprint(self.clock)
         #register timer
         self.register_timer_operation("update", self.update)
         #register subscriber function
         self.register_subscriber_operation("coordinate", self.coordinate)
-
         #self.sensors = ['N', 'E', 'S', 'W']
+        #pp.pprint(self.name) name hasn't been set yet...?
+        #how do you call a function immediately after running __init__?
+        self.initialized = False
 
     def update(self):
         #print self.clock
         #print self.Qs
         #print self.statesList[self.currentIdx]
+        if not self.initialized:
+            self.initialized = True
+            self.State = self.getState()
+            self.clock = time()
+
         if True == self.controllor():
             self.switchState()
-            self.clock = 0
+            self.clock = time()
         else:
             self.keepState()
-            self.clock += 1
-        self.simStep(self.statesList[self.currentIdx])
+            #self.clock += 1
+        #self.simStep(self.statesList[self.currentIdx])
 
+        #NEED SOME WAY TO FIGURE OUT WHO NEIGHBORS ARE
         NQmsg = [self.name, "NQ", self.Qs[0], self.statesList[self.currentIdx]]
         self.publisher("pushNQ").send(str(NQmsg))
         #self.publisher("pushEQ").send(self.name + str(self.Qs[1]))
@@ -51,73 +61,100 @@ class Intersection_Component(Component):
 
     def controllor(self):
         currentState = self.statesList[self.currentIdx]
-        if self.clock < self.minInterval[self.currentIdx]:
+        if (time() - self.clock) < self.minInterval[self.currentIdx]:
             return False
 
-        if self.clock >= self.maxInterval[self.currentIdx]:
+        if (time() - self.clock) >= self.maxInterval[self.currentIdx]:
             return True
 
         #get queue data
         redQ = 0
         GreenQ = 0
-        for i in xrange(len(currentState)):
-            if '0' == currentState[i]:
-                redQ += self.Qs[i]
-            elif '2' == currentState[i]:
-                GreenQ += self.Qs[i]
+
+        for idx, i in enumerate(self.State):
+            if (self.State[i]['vehicle']) == 'Green':
+                self.Qs[idx] = self.getDensity(i)
+                GreenQ += self.Qs[idx]
+            elif (self.State[i]['vehicle']) == 'Red':
+                self.Qs[idx] = self.getDensity(i)
+                redQ += self.Qs[idx]
             else:
                 assert False
 
+        # for i in xrange(len(currentState)):
+        #     if '2' == currentState[i]:
+        #         redQ += self.Qs[i]
+        #     elif '0' == currentState[i]:
+        #         GreenQ += self.Qs[i]
+        #     else:
+        #         assert False
+
         if redQ <= self.threshold1[self.currentIdx]:
-            #print "redQ", redQ
+            print "redQ", redQ
             return False
 
         if GreenQ > self.threshold2[self.currentIdx]:
-            #print "GreenQ", GreenQ
+            print "GreenQ", GreenQ
             return False
         else: #q1 > threshold1 and q2 < threshold2
             #print "true"
             return True
 
-
-
     def switchState(self):
         self.currentIdx = (self.currentIdx + 1) % len(self.statesList)
+        for i in self.State:
+            if (self.State[i]['vehicle']) == 'Green':
+                self.setState(i, "Red", "Red")
+            elif (self.State[i]['vehicle']) == 'Red':
+                self.setState(i, "Green", "Red")
+            else:
+                assert False
 
     def keepState(self):
         pass
 
-    def simStep(self, currentState):
-        for i in xrange(len(currentState)):
-            if '0' == currentState[i]:
-                self.Qs[i] += randint(0, 1)
-            elif '1' == currentState[i]:
-                self.Qs[i] += randint(-self.Qs[i], 1)
-            else:
-                assert False
+    # def simStep(self, currentState):
+    #     for i in xrange(len(currentState)):
+    #         if '2' == currentState[i]:
+    #             self.Qs[i] += randint(0, 1)
+    #         elif '0' == currentState[i]:
+    #             self.Qs[i] += randint(-self.Qs[i], 1)
+    #         else:
+    #             assert False
 
     def coordinate(self, msg):
         #(name, state, queue )
         #(compare states)
         print str(self.name) + " received " + msg
-        pp.pprint(self.__dict__)
+        #pp.pprint(self.__dict__)
 
-    def getState():
+    def getState(self):
+        """
+            else if (request.Method == MethodType.GETSTATE)
+            {
+                object nodeIdObj = GetObject(request.Object);
+                int nodeId = Convert.ToInt32(nodeIdObj);
+                retObj = GetNodeState(nodeId);
+            }
+        """
         data = {
                 'Method': 'GETSTATE',
                 'Object': {
                 	       'Name': 'NodeId',
                            'Type': 'PARAMETER',
-                           'Value': int(self.name),  #// should be 0 - 3 (for the selected ids)
+                           'Value': self.name,  #// should be 0 - 3 (for the selected ids)
                            'ValueType': 'System.UInt32'
                            }
                }
         data_string = json.dumps(data)
+        #pp.pprint(dataAgain['Object']['Name'])
         #state = self.client("Network_Port").call(data_string)
-        state = [2, 0, 2, 0]
+        with open('dummy.json') as node_string:
+            state = json.load(node_string)
+        #pp.pprint(state)
         return state
 
-    def getDensity(segment):
+    def getDensity(self, segment):
         data = {
                 'Method': 'GETDENSITY',
                 'Object':{
@@ -138,34 +175,34 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
         #density = self.client("Network_Port").call(data_string)
-        density = 20
+        density = randint(0, 100)
         return density
 
-    def setState:
+    def setState(self, segment, vehicleState, pedestrianState ):
         data = {
                 'Method': 'SETSTATE',
                 'Object':
                             {
                             'Name': 'NodeId',
                             'Type': 'PARAMETER',
-                            'Value': 0,  #// should be 0 - 3 (for the selected ids)
+                            'Value': int(self.name),  #// should be 0 - 3 (for the selected ids)
                             'ValueType': 'System.UInt32',
                             'Parameters':
                                         [
                                             {
                                             'Name': 'SegmentId',
                                             'Type': 'PARAMETER',
-                                            'Value': 0,
+                                            'Value': segment,
                                             'ValueType': 'System.UInt32'	    },
                                             {
                                             'Name': 'VehicleState',
                                             'Type': 'PARAMETER',
-                                            'Value': "Red",
+                                            'Value': vehicleState,
                                             'ValueType': 'System.String'	    },
                                     	    {
                                     		'Name': 'PedestrianState',
                                     		'Type': 'PARAMETER',
-                                    		'Value': "Red",
+                                    		'Value': 'Red',
                                     		'ValueType': 'System.String'
                                     	    }
 	                                    ]
