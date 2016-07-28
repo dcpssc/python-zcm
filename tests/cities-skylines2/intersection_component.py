@@ -7,6 +7,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 import json
 from time import time
+import socket
 
 class Intersection_Component(Component):
     """docstring for Network_Component"""
@@ -27,11 +28,16 @@ class Intersection_Component(Component):
         #register timer
         self.register_timer_operation("update", self.update)
         #register subscriber function
-        self.register_subscriber_operation("coordinate", self.coordinate)
+        self.register_subscriber_operation("coordinateN", self.coordinateN)
+        self.register_subscriber_operation("coordinateE", self.coordinateE)
+        self.register_subscriber_operation("coordinateS", self.coordinateS)
+        self.register_subscriber_operation("coordinateW", self.coordinateW)
         #self.sensors = ['N', 'E', 'S', 'W']
         #pp.pprint(self.name) name hasn't been set yet...?
         #how do you call a function immediately after running __init__?
         self.initialized = False
+        self.sock = socket.socket(socket.SOCK_DGRAM)
+        #self.sock.bind((UDP_IP, UDP_PORT))
 
     def update(self):
         #print self.clock
@@ -122,11 +128,23 @@ class Intersection_Component(Component):
     #         else:
     #             assert False
 
-    def coordinate(self, msg):
+    def coordinate(self, msg, segment):
         #(name, state, queue )
         #(compare states)
-        print str(self.name) + " received " + msg
+        pp.pprint(str(self.name) + segment + " segment received " + msg)
+
+    def coordinateN(self, msg):
+        self.coordinate(msg, "N")
+    def coordinateE(self, msg):
+        self.coordinate(msg, "E")
+    def coordinateS(self, msg):
+        self.coordinate(msg, "S")
+    def coordinateW(self, msg):
+        self.coordinate(msg, "W")
+
+        #print str(self.name) + " N segment received " + msg
         #pp.pprint(self.__dict__)
+        #pp.pprint("message" + msg)
 
     def getState(self):
         """
@@ -147,8 +165,9 @@ class Intersection_Component(Component):
                            }
                }
         data_string = json.dumps(data)
-        #pp.pprint(dataAgain['Object']['Name'])
-        #state = self.client("Network_Port").call(data_string)
+
+        #response = self.send(data_string)
+        #state = json.load(response)
         with open('dummy.json') as node_string:
             state = json.load(node_string)
         #pp.pprint(state)
@@ -174,7 +193,9 @@ class Intersection_Component(Component):
                          }
                 }
         data_string = json.dumps(data)
-        #density = self.client("Network_Port").call(data_string)
+
+        #response = self.send(data_string)
+        #density = json.load(response)
         density = randint(0, 100)
         return density
 
@@ -209,6 +230,18 @@ class Intersection_Component(Component):
                             }
                 }
         data_string = json.dumps(data)
-        #response = self.client("Network_Port").call(data_string)
+
+        #response = self.send(data_string)
         response = "ACK"
+        return response
+
+    def send(self, data_string):
+        self.sock.settimeout(1)
+        self.sock.sendto(data_string, ("191.168.127.100",11000))
+
+        try:
+            response, srvr = self.sock.recvfrom(1024)
+        except timeout:
+            response = ""
+            print 'Request timed out'
         return response
