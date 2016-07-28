@@ -49,6 +49,7 @@ class Intersection_Component(Component):
             self.clock = time()
 
         if True == self.controllor():
+            print "SWITCHING STATE"
             self.switchState()
             self.clock = time()
         else:
@@ -139,6 +140,7 @@ class Intersection_Component(Component):
 
     def switchState(self):
         self.currentIdx = (self.currentIdx + 1) % len(self.statesList)
+        print self.State
         for i in self.State:
             if (self.State[i]['vehicle']) == 'Green':
                 self.setState(i, "Red", "Red")
@@ -246,6 +248,8 @@ class Intersection_Component(Component):
 	return density
 
     def setState(self, segment, vehicleState, pedestrianState ):
+        self.State[segment]['vehicle'] = vehicleState
+        self.State[segment]['pedestrian'] = pedestrianState
         data = {
                 'Method': 'SETSTATE',
                 'Object':
@@ -276,9 +280,9 @@ class Intersection_Component(Component):
                             }
                 }
         data_string = json.dumps(data)
-	print data_string
+	#print data_string
         response = self.send(data_string)
-	print response
+	#print response
         #response = "ACK"
         return response
 
