@@ -1,6 +1,5 @@
 from zcm import *
 from random import randint
-import numpy as np
 import config
 import sys
 import pprint
