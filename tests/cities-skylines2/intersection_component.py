@@ -36,7 +36,7 @@ class Intersection_Component(Component):
         #pp.pprint(self.name) name hasn't been set yet...?
         #how do you call a function immediately after running __init__?
         self.initialized = False
-        self.sock = socket.socket(socket.SOCK_DGRAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.sock.bind((UDP_IP, UDP_PORT))
 
     def update(self):
@@ -164,13 +164,13 @@ class Intersection_Component(Component):
         #(compare states)
         data = json.loads(msg)
         if segment == "N":
-            self.neighbors[0] = data['QDensity']
+            self.neighbors[0] = int(data['QDensity'])
         elif segment == "E":
-            self.neighbors[1] = data['QDensity']
+            self.neighbors[1] = int(data['QDensity'])
         elif segment == "S":
-            self.neighbors[2] = data['QDensity']
+            self.neighbors[2] = int(data['QDensity'])
         elif segment == "W":
-            self.neighbors[3] = data['QDensity']
+            self.neighbors[3] = int(data['QDensity'])
         else:
             assert False
         #{State, Intersection, Segment, QDensity}
@@ -210,10 +210,10 @@ class Intersection_Component(Component):
                }
         data_string = json.dumps(data)
 
-        #response = self.send(data_string)
+        response = self.send(data_string)
         #state = json.load(response)
-        with open('dummy.json') as node_string:
-            state = json.load(node_string)
+        #with open('dummy.json') as node_string:
+        state = json.loads(response)
         #pp.pprint(state)
         return state
 
@@ -230,18 +230,20 @@ class Intersection_Component(Component):
                         	    {
                         		'Name': 'SegmentId',
                         		'Type': 'PARAMETER',
-                        		'Value': segment,
+                        		'Value': segment[-1],
                         		'ValueType': 'System.UInt32'
                         	    }
                             ]
                          }
                 }
         data_string = json.dumps(data)
-
-        #response = self.send(data_string)
-        #density = json.load(response)
-        density = randint(0, 100)
-        return density
+	#pp.pprint(data_string)
+        response = self.send(data_string)
+        #print response
+	#density = int(json.loads(response))
+        #density = randint(0, 100)
+        density = int(response)
+	return density
 
     def setState(self, segment, vehicleState, pedestrianState ):
         data = {
@@ -257,7 +259,7 @@ class Intersection_Component(Component):
                                             {
                                             'Name': 'SegmentId',
                                             'Type': 'PARAMETER',
-                                            'Value': segment,
+                                            'Value': segment[-1],
                                             'ValueType': 'System.UInt32'	    },
                                             {
                                             'Name': 'VehicleState',
@@ -274,9 +276,10 @@ class Intersection_Component(Component):
                             }
                 }
         data_string = json.dumps(data)
-
-        #response = self.send(data_string)
-        response = "ACK"
+	print data_string
+        response = self.send(data_string)
+	print response
+        #response = "ACK"
         return response
 
     def send(self, data_string):
