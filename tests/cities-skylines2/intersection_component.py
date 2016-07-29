@@ -13,7 +13,7 @@ class Intersection_Component(Component):
     def __init__(self):
         print("initialize")
         Component.__init__(self)
-        #queue parameters?
+        #queue parameters
         self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
         self.neighbors = [0, 0, 0, 0]
         self.minInterval = [5, 5]
