@@ -21,7 +21,6 @@ class Intersection_Component(Component):
         self.threshold1 = [30, 30] #if density % is lower don't switch
         self.threshold2 = [70, 70] #if density % if higher don't switch
         self.statesList = ['1', '2']
-        #self.stateMask = ['0202']
         self.currentIdx = 0
         self.clock = 0
         #pp.pprint(self.clock)
