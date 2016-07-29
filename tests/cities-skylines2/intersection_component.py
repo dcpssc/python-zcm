@@ -16,10 +16,10 @@ class Intersection_Component(Component):
         #queue parameters
         self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
         self.neighbors = [0, 0, 0, 0]
-        self.minInterval = [30, 30]
+        self.minInterval = [20, 20]
         self.maxInterval = [60, 80]
-        self.threshold1 = [10, 10] #if density % is lower don't switch
-        self.threshold2 = [20, 20] #if density % if higher don't switch
+        self.threshold1 = [20, 20] #if density % is lower don't switch
+        self.threshold2 = [40, 40] #if density % if higher don't switch
         self.statesList = ['1', '2']
         self.currentIdx = 0
         self.clock = 0
